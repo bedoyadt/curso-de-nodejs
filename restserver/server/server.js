@@ -2,49 +2,45 @@ require('./config/config');
 
 const express = require('express');
 
-const bodyParser = require('body-parser');
+const path = require('path');
+
+const mongoose = require('mongoose');
 
 const app = express();
+const hbs = require('hbs');
+const bodyParser = require('body-parser');
+
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(bodyParser.json());
 
+//app.use(require("./router/usuario"));
+//=======================================================
+app.set('port', process.env.PORT || 3000);
+hbs.registerPartials(__dirname + '/views');
+
+//========================================================
 
 
-app.get('/usuario', function(req, res) {
+//--------------------------------------
 
-    res.json('get usuario');
+app.set('view engine', '.hbs');
+app.use(require("./router/usuario"));
 
+//------------------------------------------------
+
+mongoose.connect(process.env.URLDB, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}, (err, res) => {
+    if (err) throw err;
+    console.log("Conectado a la DB");
 });
 
-app.post('/usuario', function(req, res) {
-
-    let body = req.body;
-
-    res.json({
-        persona: body
-    });
-});
-
-
-app.put('/usuario/:id', function(req, res) {
-
-    let id = req.params.id;
-
-    res.json({
-        //retornando el id que mande apedir
-        id
-
-    });
-});
-
-
-app.delete('/usuario', function(req, res) {
-
-    res.json('delete usuario');
-
-});
+//============================
+//app.use('/', app);
+//==========================================
 
 app.listen(process.env.PORT, () => {
     console.log('Escuchando en el puerto', process.env.PORT);
